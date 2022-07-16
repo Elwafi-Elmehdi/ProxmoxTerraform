@@ -1,3 +1,7 @@
 provider "proxmox" {
-  # Configuration options
+  pm_api_url          = var.proxmox_api_url
+  pm_api_token_id     = var.proxmox_api_token_id
+  pm_api_token_secret = var.proxmox_api_token_secret
+  pm_tls_insecure     = true # to skip ca trust issues
+  pm_debug            = true # to debug problem with the client api
 }
