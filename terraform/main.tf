@@ -6,26 +6,29 @@ provider "proxmox" {
   pm_debug            = true # to debug problem with the client api
 }
 
-resource "proxmox_vm_qemu" "ubuntu-test-1" {
-  name        = "ubuntu-2"
+resource "proxmox_vm_qemu" "ubuntu-1" {
+  name        = "ubuntu-1"
   desc        = "Ubuntu test server terraform init"
-  vmid        = 201
-  target_node = "pve2"
+  vmid        = 101
+  target_node = "pve1"
   agent       = 1
   clone       = "ubuntu"
-  
-  sockets     = 1
-  cores       = 1
-  cpu         = "host"
-  memory      = 2048
-  pool        = "stagging"
+  oncreate    = true
+  # hagroup     = "pve-cluster"
+  # guest_agent_ready_timeout = 120
+  sockets    = 1
+  cores      = 1
+  cpu        = "host"
+  memory     = 2048
+  pool       = "stagging"
+  full_clone = true
   network {
     bridge = "vmbr0"
     model  = "virtio"
   }
   disk {
     storage = "local-lvm"
-    type    = "virtio"
+    type    = "scsi"
     size    = "8G"
   }
   os_type   = "cloud-init"
