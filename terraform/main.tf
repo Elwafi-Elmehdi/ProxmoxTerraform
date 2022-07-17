@@ -14,14 +14,14 @@ resource "proxmox_vm_qemu" "ubuntu-1" {
   agent       = 1
   clone       = "ubuntu"
   oncreate    = true
-  # hagroup     = "pve-cluster"
-  # guest_agent_ready_timeout = 120
-  sockets    = 1
-  cores      = 1
-  cpu        = "host"
-  memory     = 2048
-  pool       = "stagging"
-  full_clone = true
+  sockets     = 1
+  cores       = 1
+  cpu         = "host"
+  memory      = 2048
+  full_clone  = true
+  os_type     = "cloud-init"
+  ipconfig0   = "ip=192.168.1.16/24,gw=192.168.1.254"
+  ciuser      = "mehdi"
   network {
     bridge = "vmbr0"
     model  = "virtio"
@@ -31,6 +31,31 @@ resource "proxmox_vm_qemu" "ubuntu-1" {
     type    = "scsi"
     size    = "8G"
   }
-  os_type   = "cloud-init"
-  ipconfig0 = "ip=192.168.1.16/24,gw=192.168.1.254"
+}
+
+resource "proxmox_lxc" "docker8" {
+  vmid         = 304
+  clone        = "300"
+  full         = true
+  hostname     = "docker8"
+  target_node  = "pve2"
+  unprivileged = true
+  password     = var.proxmox_lxc_password
+
+
+  features {
+    nesting = true
+  }
+
+  rootfs {
+    storage = "local-lvm"
+    size    = "4G"
+  }
+
+  network {
+    name   = "eth0"
+    bridge = "vmbr0"
+    ip     = "dhcp"
+    ip6    = "dhcp"
+  }
 }
