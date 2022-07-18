@@ -41,7 +41,8 @@ resource "proxmox_lxc" "docker8" {
   target_node  = "pve2"
   unprivileged = true
   password     = var.proxmox_lxc_password
-
+  cores        = 1
+  memory       = 1024
 
   features {
     nesting = true
@@ -55,7 +56,8 @@ resource "proxmox_lxc" "docker8" {
   network {
     name   = "eth0"
     bridge = "vmbr0"
-    ip     = "dhcp"
+    ip     = "192.168.1.17/24"
+    gw     = "192.168.1.254"
     ip6    = "dhcp"
   }
 }
