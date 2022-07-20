@@ -6,6 +6,11 @@ provider "proxmox" {
   pm_debug            = true # to debug problem with the client api
 }
 
+resource "proxmox_pool" "proxmox_cluster_pool_prod" {
+  poolid  = "prod"
+  comment = "a pool for all resources that are crucial and up runing"
+}
+
 resource "proxmox_vm_qemu" "ubuntu-1" {
   name        = "ubuntu-1"
   desc        = "Ubuntu test server terraform init"
