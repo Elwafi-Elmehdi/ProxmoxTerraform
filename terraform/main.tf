@@ -77,11 +77,15 @@ resource "proxmox_lxc" "proxmox_lxc_docker_manager" {
   vmid            = sum([401, tonumber("${count.index}")])
   clone           = count.index <= 1 ? "400" : "300"
   target_node     = count.index <= 1 ? "pve1" : "pve2"
+  startup         = true
+  unprivileged    = true
+  cores           = 1
   full            = true
+  memory          = 1024
+  pool            = "prod"
   hostname        = "dockermgr-${count.index}"
   ssh_public_keys = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA3ncqw0OWLcKlF00FjqpGXSBUwJ8CxJc0WB2NaJ5yU Proxmox LXC docker manager hosts"
-  cores           = 1
-  memory          = 1024
+
   features {
     nesting = true
   }
@@ -94,7 +98,7 @@ resource "proxmox_lxc" "proxmox_lxc_docker_manager" {
     bridge = "vmbr0"
     ip     = var.proxmox_lxc_docker_manager_ips[count.index]
     gw     = "192.168.1.254"
-    ip6    = "dhcp"
+    ip6    = "auto"
   }
 }
 
