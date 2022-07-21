@@ -20,23 +20,25 @@ resource "proxmox_vm_qemu" "centos-1" {
   name        = "centos-1"
   desc        = "CentOS Test Server for practicing my linux+ cours"
   vmid        = 201
+  agent       = 0
   target_node = "pve2"
   pool        = "testing"
-  iso         = "CentOS-7-x86_64-Minimal-2009.iso"
+  iso         = "local:iso/CentOS-7-x86_64-Minimal-2009.iso"
   oncreate    = true
   sockets     = 1
   cores       = 1
   memory      = 1024
   os_type     = "Linux 5.x - 2.6 Kernel"
-
   network {
     bridge = "vmbr0"
     model  = "virtio"
   }
   disk {
-    storage = "local-lvm"
-    type    = "scsi"
-    size    = "4G"
+    slot     = 0
+    iothread = 0
+    storage  = "local-lvm"
+    type     = "scsi"
+    size     = "4G"
   }
 }
 
@@ -66,7 +68,33 @@ resource "proxmox_vm_qemu" "ubuntu-1" {
   disk {
     storage = "local-lvm"
     type    = "scsi"
+    size    = "8G"
+  }
+}
+
+resource "proxmox_lxc" "proxmox_lxc_docker_manager" {
+  count           = length(var.proxmox_lxc_docker_manager_ips)
+  vmid            = sum([401, tonumber("${count.index}")])
+  clone           = count.index <= 1 ? "400" : "300"
+  target_node     = count.index <= 1 ? "pve1" : "pve2"
+  full            = true
+  hostname        = "dockermgr-${count.index}"
+  ssh_public_keys = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA3ncqw0OWLcKlF00FjqpGXSBUwJ8CxJc0WB2NaJ5yU Proxmox LXC docker manager hosts"
+  cores           = 1
+  memory          = 1024
+  features {
+    nesting = true
+  }
+  rootfs {
+    storage = "local-lvm"
     size    = "4G"
+  }
+  network {
+    name   = "eth0"
+    bridge = "vmbr0"
+    ip     = var.proxmox_lxc_docker_manager_ips[count.index]
+    gw     = "192.168.1.254"
+    ip6    = "dhcp"
   }
 }
 
@@ -91,11 +119,11 @@ resource "proxmox_vm_qemu" "ubuntu-1" {
 #     size    = "4G"
 #   }
 
-#   network {
-#     name   = "eth0"
-#     bridge = "vmbr0"
-#     ip     = "192.168.1.17/24"
-#     gw     = "192.168.1.254"
-#     ip6    = "dhcp"
-#   }
+# network {
+#   name   = "eth0"
+#   bridge = "vmbr0"
+#   ip     = "192.168.1.17/24"
+#   gw     = "192.168.1.254"
+#   ip6    = "dhcp"
+# }
 # }
