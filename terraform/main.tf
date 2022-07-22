@@ -100,3 +100,33 @@ resource "proxmox_lxc" "proxmox_lxc_docker_manager" {
     ip6    = "auto"
   }
 }
+
+resource "proxmox_lxc" "proxmox_lxc_docker_worker" {
+  count        = length(var.proxmox_docker_workers_ips)
+  vmid         = sum([408, count.index])
+  clone        = count.index <= 2 ? "400" : "300"
+  target_node  = count.index <= 2 ? "pve1" : "pve2"
+  unprivileged = true
+  onboot       = true
+  password     = var.proxmox_lxc_password
+  cores        = 1
+  full         = true
+  memory       = 1024
+  pool         = "prod"
+  hostname     = "dockerwrk-${count.index}"
+
+  features {
+    nesting = true
+  }
+  rootfs {
+    storage = "local-lvm"
+    size    = "4G"
+  }
+  network {
+    name   = "eth0"
+    bridge = "vmbr0"
+    ip     = var.proxmox_docker_workers_ips[count.index]
+    gw     = var.proxmox_network_gateway_ip
+    ip6    = "auto"
+  }
+}

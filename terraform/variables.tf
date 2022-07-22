@@ -26,7 +26,7 @@ variable "proxmox_docker_manager_ips" {
 variable "proxmox_docker_workers_ips" {
   type        = list(string)
   description = "The IP addresses for docker swarm workers"
-  default     = ["192.168.1.28/24", "192.168.1.29/24", "192.168.1.30/24", "192.168.1.31/24"]
+  default     = ["192.168.1.28/24", "192.168.1.29/24", "192.168.1.30/24", "192.168.1.31/24", "192.168.1.32/24"]
 }
 
 variable "proxmox_network_gateway_ip" {
