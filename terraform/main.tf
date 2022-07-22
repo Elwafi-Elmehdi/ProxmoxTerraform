@@ -44,6 +44,33 @@ resource "proxmox_pool" "proxmox_cluster_pool_testing" {
 #     size    = "8G"
 #   }
 # }
+resource "proxmox_lxc" "proxmox_lxc_turnkey_gitea_server" {
+  vmid         = 407
+  unprivileged = true
+  onboot       = true
+  target_node  = "pve2"
+  hostname     = "gitea"
+  memory       = 1024
+  cores        = 2
+  pool         = "prod"
+  password     = var.proxmox_lxc_password
+  ostemplate   = "local:vztmpl/debian-10-turnkey-gitea_16.1-1_amd64.tar.gz"
+  features {
+    nesting = true
+  }
+  network {
+    name   = "eth0"
+    bridge = "vmbr0"
+    ip     = "192.168.1.33/24"
+    gw     = var.proxmox_network_gateway_ip
+    ip6    = "auto"
+  }
+  rootfs {
+    storage = "local-lvm"
+    size    = "4G"
+  }
+}
+
 resource "proxmox_lxc" "proxmox_lxc_docker_manager" {
   count        = length(var.proxmox_docker_manager_ips)
   vmid         = sum([401, count.index])
